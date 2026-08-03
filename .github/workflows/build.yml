@@ -14,8 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Restore project
+        shell: bash
         run: |
-          cat archive/part-* | base64 -d > MAD101_G3A_Project.zip
+          test -f MAD101_G3A_Project.zip
+          unzip -t MAD101_G3A_Project.zip
           unzip -q MAD101_G3A_Project.zip
       - name: Run host tests
         working-directory: MAD101_G3A_Project
@@ -29,8 +31,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Restore project
+        shell: bash
         run: |
-          cat archive/part-* | base64 -d > MAD101_G3A_Project.zip
+          test -f MAD101_G3A_Project.zip
+          unzip -t MAD101_G3A_Project.zip
           unzip -q MAD101_G3A_Project.zip
       - name: Cache fxSDK toolchain
         uses: actions/cache@v4
@@ -38,7 +42,7 @@ jobs:
           path: |
             ~/.local
             ~/.cache/giteapc
-          key: fxsdk-gint-v2-${{ runner.os }}
+          key: fxsdk-gint-v3-${{ runner.os }}
       - name: Install fxSDK, SuperH compiler and gint
         shell: bash
         run: |
