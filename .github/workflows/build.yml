@@ -24,6 +24,7 @@ jobs:
           python3 patches/add_graph_types_reference.py MAD101_G3A_Project/src/main.c
           python3 patches/add_prefix_postfix_evaluator.py MAD101_G3A_Project/src/main.c
           python3 patches/add_prefix_postfix_tips.py MAD101_G3A_Project/src/main.c
+          python3 patches/add_affine_cipher_solver.py MAD101_G3A_Project/src/main.c
       - name: Run host tests
         working-directory: MAD101_G3A_Project
         run: |
@@ -46,6 +47,7 @@ jobs:
           python3 patches/add_graph_types_reference.py MAD101_G3A_Project/src/main.c
           python3 patches/add_prefix_postfix_evaluator.py MAD101_G3A_Project/src/main.c
           python3 patches/add_prefix_postfix_tips.py MAD101_G3A_Project/src/main.c
+          python3 patches/add_affine_cipher_solver.py MAD101_G3A_Project/src/main.c
       - name: Cache fxSDK toolchain
         uses: actions/cache@v4
         with:
@@ -98,6 +100,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add release/MAD101.g3a
           if ! git diff --cached --quiet; then
-            git commit -m "Publish MAD101.g3a prefix postfix tips [skip ci]"
+            git commit -m "Publish MAD101.g3a affine cipher solver [skip ci]"
             git push
           fi
