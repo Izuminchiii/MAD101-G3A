@@ -27,7 +27,18 @@ jobs:
           python3 patches/add_affine_cipher_solver.py MAD101_G3A_Project/src/main.c
       - name: Run host tests
         working-directory: MAD101_G3A_Project
+        shell: bash
         run: |
+          # The lightweight host keyboard stub predates the left/right key constants
+          # used by the new string editor. Real gint already provides these keys.
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("tests/stubs/gint/keyboard.h")
+          source = path.read_text(encoding="utf-8")
+          if "KEY_LEFT" not in source:
+              source = "#define KEY_LEFT 1001\n#define KEY_RIGHT 1002\n" + source
+              path.write_text(source, encoding="utf-8")
+          PY
           make -f Makefile.host test
           make -f Makefile.host syntax
 
@@ -100,6 +111,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add release/MAD101.g3a
           if ! git diff --cached --quiet; then
-            git commit -m "Publish MAD101.g3a affine cipher solver [skip ci]"
+            git commit -m "Publish MAD101.g3a formula cipher solver [skip ci]"
             git push
           fi
