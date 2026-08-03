@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   host-tests:
     runs-on: ubuntu-latest
@@ -50,7 +53,6 @@ jobs:
           if ! command -v sh-elf-gcc >/dev/null 2>&1 || ! command -v fxsdk >/dev/null 2>&1; then
             giteapc install Lephenixnoir/fxsdk Lephenixnoir/sh-elf-binutils Lephenixnoir/sh-elf-gcc
             giteapc install Lephenixnoir/OpenLibm Vhex-Kernel-Core/fxlibc
-            giteapc install Lephenixnoir/sh-elf-gcc
             giteapc install Lephenixnoir/gint
           fi
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -61,8 +63,23 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           fxsdk build-cg
           mkdir -p ../artifact
-          cp "$(find . -name 'MAD101.g3a' | head -n 1)" ../artifact/MAD101.g3a
-      - uses: actions/upload-artifact@v4
+          binary="$(find . -name 'MAD101.g3a' | head -n 1)"
+          test -n "$binary"
+          cp "$binary" ../artifact/MAD101.g3a
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
         with:
           name: MAD101-g3a
           path: artifact/MAD101.g3a
+      - name: Publish binary in repository
+        shell: bash
+        run: |
+          mkdir -p release
+          cp artifact/MAD101.g3a release/MAD101.g3a
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release/MAD101.g3a
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish MAD101.g3a [skip ci]"
+            git push
+          fi
