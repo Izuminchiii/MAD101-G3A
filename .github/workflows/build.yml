@@ -69,6 +69,8 @@ jobs:
         shell: bash
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          # Current gint names the parenthesis keys KEY_LEFTP and KEY_RIGHTP.
+          sed -i 's/KEY_LPAR/KEY_LEFTP/g; s/KEY_RPAR/KEY_RIGHTP/g' src/main.c
           fxsdk build-cg
           mkdir -p ../artifact
           binary="$(find . -name 'MAD101.g3a' | head -n 1)"
