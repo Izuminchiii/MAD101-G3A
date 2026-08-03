@@ -44,7 +44,7 @@ jobs:
           path: |
             ~/.local
             ~/.cache/giteapc
-          key: fxsdk-gint-v4-${{ runner.os }}
+          key: fxsdk-gint-v5-${{ runner.os }}
       - name: Install fxSDK, SuperH compiler and gint
         shell: bash
         run: |
@@ -53,7 +53,7 @@ jobs:
           export PATH="$HOME/.local/bin:$PATH"
           if ! command -v giteapc >/dev/null 2>&1; then
             curl -L "https://git.planet-casio.com/Lephenixnoir/GiteaPC/raw/branch/master/install.sh" -o /tmp/giteapc-install.sh
-            yes '' | bash /tmp/giteapc-install.sh
+            printf '\n' | bash /tmp/giteapc-install.sh
           fi
           export PATH="$HOME/.local/bin:$PATH"
           if ! command -v sh-elf-gcc >/dev/null 2>&1 || ! command -v fxsdk >/dev/null 2>&1; then
