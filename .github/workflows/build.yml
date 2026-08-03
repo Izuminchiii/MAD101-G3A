@@ -1,0 +1,68 @@
+name: Build MAD101.g3a
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore project
+        run: |
+          cat archive/part-* | base64 -d > MAD101_G3A_Project.zip
+          unzip -q MAD101_G3A_Project.zip
+      - name: Run host tests
+        working-directory: MAD101_G3A_Project
+        run: |
+          make -f Makefile.host test
+          make -f Makefile.host syntax
+
+  build-g3a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore project
+        run: |
+          cat archive/part-* | base64 -d > MAD101_G3A_Project.zip
+          unzip -q MAD101_G3A_Project.zip
+      - name: Cache fxSDK toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local
+            ~/.cache/giteapc
+          key: fxsdk-gint-v2-${{ runner.os }}
+      - name: Install fxSDK, SuperH compiler and gint
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake git curl pkg-config python3 python3-pil libpng-dev libusb-1.0-0-dev libudev-dev libsdl2-dev libncurses-dev
+          export PATH="$HOME/.local/bin:$PATH"
+          if ! command -v giteapc >/dev/null 2>&1; then
+            curl -L "https://git.planet-casio.com/Lephenixnoir/GiteaPC/raw/branch/master/install.sh" -o /tmp/giteapc-install.sh
+            yes '' | bash /tmp/giteapc-install.sh
+          fi
+          export PATH="$HOME/.local/bin:$PATH"
+          if ! command -v sh-elf-gcc >/dev/null 2>&1 || ! command -v fxsdk >/dev/null 2>&1; then
+            giteapc install Lephenixnoir/fxsdk Lephenixnoir/sh-elf-binutils Lephenixnoir/sh-elf-gcc
+            giteapc install Lephenixnoir/OpenLibm Vhex-Kernel-Core/fxlibc
+            giteapc install Lephenixnoir/sh-elf-gcc
+            giteapc install Lephenixnoir/gint
+          fi
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build add-in
+        working-directory: MAD101_G3A_Project
+        shell: bash
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          fxsdk build-cg
+          mkdir -p ../artifact
+          cp "$(find . -name 'MAD101.g3a' | head -n 1)" ../artifact/MAD101.g3a
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MAD101-g3a
+          path: artifact/MAD101.g3a
