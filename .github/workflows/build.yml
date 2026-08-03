@@ -16,9 +16,10 @@ jobs:
       - name: Restore project
         shell: bash
         run: |
-          test -f MAD101_G3A_Project.zip
-          unzip -t MAD101_G3A_Project.zip
-          unzip -q MAD101_G3A_Project.zip
+          zip_file="$(find . -maxdepth 1 -type f -name 'MAD101_G3A_Project*.zip' | head -n 1)"
+          test -n "$zip_file"
+          unzip -t "$zip_file"
+          unzip -q "$zip_file"
       - name: Run host tests
         working-directory: MAD101_G3A_Project
         run: |
@@ -33,16 +34,17 @@ jobs:
       - name: Restore project
         shell: bash
         run: |
-          test -f MAD101_G3A_Project.zip
-          unzip -t MAD101_G3A_Project.zip
-          unzip -q MAD101_G3A_Project.zip
+          zip_file="$(find . -maxdepth 1 -type f -name 'MAD101_G3A_Project*.zip' | head -n 1)"
+          test -n "$zip_file"
+          unzip -t "$zip_file"
+          unzip -q "$zip_file"
       - name: Cache fxSDK toolchain
         uses: actions/cache@v4
         with:
           path: |
             ~/.local
             ~/.cache/giteapc
-          key: fxsdk-gint-v3-${{ runner.os }}
+          key: fxsdk-gint-v4-${{ runner.os }}
       - name: Install fxSDK, SuperH compiler and gint
         shell: bash
         run: |
