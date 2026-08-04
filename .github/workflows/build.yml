@@ -32,6 +32,7 @@ jobs:
           python3 patches/show_lcg_formula_during_input.py MAD101_G3A_Project/src/main.c
           python3 patches/add_set_notation_tips.py MAD101_G3A_Project/src/main.c
           python3 patches/add_negation_guide.py MAD101_G3A_Project/src/main.c
+          python3 patches/add_negation_solver.py MAD101_G3A_Project/src/main.c
           python3 patches/add_function_huffman_tools.py MAD101_G3A_Project/src/main.c
           python3 patches/add_tonight_quiz_summary.py MAD101_G3A_Project/src/main.c
       - name: Run host tests
@@ -75,6 +76,7 @@ jobs:
           python3 patches/show_lcg_formula_during_input.py MAD101_G3A_Project/src/main.c
           python3 patches/add_set_notation_tips.py MAD101_G3A_Project/src/main.c
           python3 patches/add_negation_guide.py MAD101_G3A_Project/src/main.c
+          python3 patches/add_negation_solver.py MAD101_G3A_Project/src/main.c
           python3 patches/add_function_huffman_tools.py MAD101_G3A_Project/src/main.c
           python3 patches/add_tonight_quiz_summary.py MAD101_G3A_Project/src/main.c
       - name: Cache fxSDK toolchain
@@ -129,7 +131,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add release/MAD101.g3a
           if ! git diff --cached --quiet; then
-            git commit -m "Publish MAD101.g3a negation guide [skip ci]"
+            git commit -m "Publish MAD101.g3a interactive negation solver [skip ci]"
             git pull --rebase origin main
             git push
           fi
