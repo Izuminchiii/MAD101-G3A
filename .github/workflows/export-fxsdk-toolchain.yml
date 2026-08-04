@@ -1,0 +1,48 @@
+name: Export cached fxSDK toolchain
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/export-fxsdk-toolchain.yml"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore the successful MAD101 fxSDK cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.local
+            ~/.cache/giteapc
+          key: fxsdk-gint-v7-${{ runner.os }}
+          fail-on-cache-miss: true
+
+      - name: Verify and package toolchain
+        shell: bash
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          command -v sh-elf-gcc
+          command -v fxsdk
+          sh-elf-gcc --version | head -n 1
+          fxsdk --version || true
+          tar --exclude='.local/share/giteapc' \
+              --exclude='.local/state' \
+              -czf fxsdk-toolchain-linux-x86_64.tar.gz \
+              -C "$HOME" .local
+          sha256sum fxsdk-toolchain-linux-x86_64.tar.gz > SHA256SUMS.txt
+          stat -c '%s' fxsdk-toolchain-linux-x86_64.tar.gz > SIZE_BYTES.txt
+
+      - name: Upload reusable toolchain
+        uses: actions/upload-artifact@v4
+        with:
+          name: fxsdk-toolchain-linux-x86_64
+          path: |
+            fxsdk-toolchain-linux-x86_64.tar.gz
+            SHA256SUMS.txt
+            SIZE_BYTES.txt
+          retention-days: 7
