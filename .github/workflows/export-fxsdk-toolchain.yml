@@ -12,6 +12,9 @@ on:
       - ".github/workflows/export-fxsdk-toolchain.yml"
       - "README.md"
 
+permissions:
+  contents: write
+
 jobs:
   export:
     runs-on: ubuntu-latest
@@ -51,3 +54,22 @@ jobs:
             SHA256SUMS.txt
             SIZE_BYTES.txt
           retention-days: 7
+
+      - name: Publish public toolchain release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="fxsdk-toolchain-v1"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" \
+              fxsdk-toolchain-linux-x86_64.tar.gz \
+              SHA256SUMS.txt SIZE_BYTES.txt --clobber
+          else
+            gh release create "$tag" \
+              fxsdk-toolchain-linux-x86_64.tar.gz \
+              SHA256SUMS.txt SIZE_BYTES.txt \
+              --title "Cached fxSDK toolchain v1" \
+              --notes "Verified Linux x86_64 fxSDK 2.11.0, sh-elf-gcc 14.1.0 and gint toolchain used to build the calculator add-ins."
+          fi
